@@ -39,8 +39,6 @@ public:
 
 	void server(); //DONE
 
-	//void bindAndListen(); //DONE
-	//void accept(); //DONE
 	void clientHandler(SOCKET); //DONE
 	void safeDeleteUser(RecievedMessage*); //DONE
 

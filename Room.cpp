@@ -16,22 +16,24 @@ using namespace std;
 
 Room::Room(int id, User* admin, string name, int maxUsers, int questionsNo, int questionTime) :
 _id(id), _admin(admin), _name(name), _maxUsers(maxUsers), _questionNo(questionsNo), _questionTime(questionTime)
-{}
+{
+	_users.insert(_users.end(), admin);
+}
 
 bool Room::joinRoom(User* user)
 {
 	string updateAllUsers;
 	if (_users.size() < _maxUsers) //if there is place inside the room
 	{
-		_users.push_back(user);
-		user->send("succsess");
-		updateAllUsers = getUsersListMessage();
-		sendMessage(updateAllUsers);
+		_users.insert(_users.end(), user);
+		//user->send("succsess");
+		//updateAllUsers = getUsersListMessage();
+		//sendMessage(updateAllUsers);
 		return true;
 	}
 	else
 	{
-		user->send("failure");
+		//user->send("failure");
 		return false;
 	}
 }
@@ -39,22 +41,13 @@ bool Room::joinRoom(User* user)
 void Room::leaveRoom(User* user)
 {
 	int i = 0;
-	bool flag = false;
-
-	while (!flag) //runs untill we found the wanted user
+	for (int i = 0; i < _users.size(); i++)
 	{
 		if (_users[i]->getUsername() == user->getUsername())
 		{
-			flag = true;
+			vector<User*>::iterator it = _users.begin() + i;
+			_users.erase(it);
 		}
-	}
-
-	if (i != _users.size()) //if we didnt skip the user\ user doesn't exist
-	{
-		vector<User*>::iterator it = _users.begin() + i;
-		_users.erase(it);
-		user->send("success");
-		sendMessage(user, getUsersListMessage());
 	}
 }
 
@@ -64,7 +57,7 @@ int Room::closeRoom(User* user)
 	{
 		for (int i = 0; i < _users.size(); i++) //goes throughout all active users
 		{
-			_users[i]->closeRoom();
+			_users[i]->send("116");
 		}
 
 		for (int i = 0; i < _users.size(); i++) //goes throughout all active users
@@ -99,10 +92,11 @@ string Room::getUsersListMessage()
 	}
 	else
 	{
+		M += to_string(_users.size());
 		for (int i = 0; i < _users.size(); i++) //goes throughout all active users
 		{
 			temp = _users[i];
-			size = std::stoi(temp->getUsername());
+			size = temp->getUsername().length();
 			sizeName = Helper::getPaddedNumber(size, 2);
 			M += sizeName + temp->getUsername();
 		}

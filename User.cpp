@@ -73,7 +73,6 @@ bool User::createRoom(int roomID, string roomName, int maxUsers, int questionNo,
 	if (_currRoom == nullptr)
 	{
 		_currRoom = new Room(roomID, this, roomName, maxUsers, questionNo, questionTime);
-		_currRoom->joinRoom(this); //May cause an error, check in debugging!
 		Helper::sendData(_sock, "1140"); //The room was created successfuly.
 		return true;
 	}
@@ -85,10 +84,11 @@ bool User::createRoom(int roomID, string roomName, int maxUsers, int questionNo,
 /*Joins a room!*/
 bool User::joinRoom(Room* newRoom)
 {
-	if (_currRoom == nullptr)
+	if (_currRoom != nullptr)
 		return false;
 
-	_currRoom->joinRoom(this); //Associating our user with the room.
+	_currRoom = newRoom;
+	_currRoom->joinRoom(this);
 	return true;
 
 }
